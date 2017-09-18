@@ -1,29 +1,35 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 )
 
+var ErrInvalidNumber = errors.New("the value is not a number")
+
 func main() {
-	checkNumber(getValue())
-}
-
-func getValue() string {
-	if len(os.Args)-1 < 1 {
-		fmt.Println("One arg is requerid for this program")
-		os.Exit(1)
+	if len(os.Args) < 2 {
+		log.Fatal("One arg is required for this program")
 	}
-	value := os.Args[1]
-	return value
-}
 
-func checkNumber(value string) {
-	fValue, err := strconv.ParseFloat(value, 64)
+	msg, err := checkNumber(os.Args[1])
+
 	if err != nil {
-		fmt.Printf("The value <%s> is not a number\n", value)
-		os.Exit(1)
+		log.Fatal(err)
 	}
-	fmt.Printf("The value <%f> is a valid number\n", fValue)
+
+	fmt.Print(msg)
+}
+
+func checkNumber(value string) (string, error) {
+	fValue, err := strconv.ParseFloat(value, 64)
+
+	if err != nil {
+		return "", ErrInvalidNumber
+	}
+
+	return fmt.Sprintf("The value <%f> is a valid number", fValue), nil
 }
